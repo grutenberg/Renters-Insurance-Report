@@ -19,7 +19,6 @@ class RentersInsuranceReport(object):
         # Delete what were the rows with the names of the columns
         self.dataframe.drop([2, 3], inplace=True, axis=0)
 
-        print(self.dataframe)
         # Renaming tenant id to property id
         last_property = None
         for index, row in self.dataframe.iterrows():
@@ -38,8 +37,6 @@ class RentersInsuranceReport(object):
             'Occupancy Status',
             'Policy Status',
             'Rental Type',
-            'Insurance Company',
-            'Policy Number',
             'Policy Title',
             'Lease From',
             'Lease To',
@@ -50,10 +47,20 @@ class RentersInsuranceReport(object):
             'Pet Endorsement',
             'Interested Party'
         ], inplace=True, axis=1)
-        self.dataframe.drop(self.dataframe.columns[5], axis=1, inplace=True)
+        self.dataframe.drop(self.dataframe.columns[7], axis=1, inplace=True)
 
         self.dataframe['Name'], self.dataframe['Unit'] = self.dataframe['Unit'], self.dataframe['Name']
 
+        self.dataframe.columns = [
+            'Property Address',
+            'Unit',
+            'Tenant',
+            'Insurance Provider',
+            'Policy ID',
+            'Liability Coverage',
+            'Expiration Date',
+            'Additional Notes'
+        ]
         print("DATAFRAME")
         print(self.dataframe)
 
