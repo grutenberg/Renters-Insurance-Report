@@ -76,9 +76,16 @@ class RentersInsuranceReport(object):
 
         worksheet = self.workbook.add_worksheet("Renters Insurance MM-DD-YY")
 
-        expired_format = self.workbook.add_format({'border': 1, 'bg_color': 'red'})
-        about_to_expire_format = self.workbook.add_format({'border': 1, 'bg_color': 'yellow'})
-        under_insured_format = self.workbook.add_format({'border': 1, 'bg_color': 'blue'})
+        expired_format = self.workbook.add_format({'border': 1, 'bg_color': 'red', "align": "center", "valign": "vcenter"})
+        about_to_expire_format = self.workbook.add_format({'border': 1, 'bg_color': 'yellow', "align": "center", "valign": "vcenter"})
+        under_insured_format = self.workbook.add_format({'border': 1, 'bg_color': 'blue', "align": "center", "valign": "vcenter"})
+        column_name_format = self.workbook.add_format({
+            "bold": 1,
+            "border": 1,
+            "align": "center",
+            "valign": "vcenter",
+            "bg_color": "gray"
+        })
         main_title_format = self.workbook.add_format({
             "bold": 1,
             "border": 1,
@@ -94,6 +101,10 @@ class RentersInsuranceReport(object):
         worksheet.merge_range("E2:H2", "Renter's Insurance", main_title_format)
         worksheet.merge_range("E5:G5", "Report Date:", main_title_format)
 
+        worksheet.write_row(7, 0, self.columns, column_name_format)
+
+
+        worksheet.set_row(7, 30)
         worksheet.hide_gridlines(2)
         worksheet.autofit()
 
