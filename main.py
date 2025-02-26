@@ -69,6 +69,10 @@ class RentersInsuranceReport(object):
         self.dataframe.insert(7, "Dummy", None)
 
         self.dataframe.columns = self.columns
+
+        self.dataframe.fillna('', inplace=True)
+        self.dataframe.reset_index(inplace=True, drop=True)
+
         print("DATAFRAME")
         print(self.dataframe)
 
@@ -76,6 +80,7 @@ class RentersInsuranceReport(object):
 
         worksheet = self.workbook.add_worksheet("Renters Insurance MM-DD-YY")
 
+        default_cell_format = self.workbook.add_format({'border': 1, 'bg_color': 'red', "align": "center", "valign": "vcenter"})
         expired_format = self.workbook.add_format({'border': 1, 'bg_color': 'red', "align": "center", "valign": "vcenter"})
         about_to_expire_format = self.workbook.add_format({'border': 1, 'bg_color': 'yellow', "align": "center", "valign": "vcenter"})
         under_insured_format = self.workbook.add_format({'border': 1, 'bg_color': 'blue', "align": "center", "valign": "vcenter"})
@@ -103,10 +108,11 @@ class RentersInsuranceReport(object):
 
         worksheet.write_row(7, 0, self.columns, column_name_format)
 
+        for index, row in self.dataframe.iterrows():
+            worksheet.write_row(8+index, 0, row)
 
-        worksheet.set_row(7, 30)
         worksheet.hide_gridlines(2)
-        worksheet.autofit()
+        worksheet.autofit(max_width=180)
 
         self.workbook.close()
 
