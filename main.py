@@ -5,6 +5,19 @@ from xlsxwriter import Workbook
 class RentersInsuranceReport(object):
     def __init__(self, input_url: str) -> None:
         self.dataframe = pd.read_excel(input_url)
+        self.workbook = Workbook("output.xlsx")
+
+        self.columns = [
+            'Property Address',
+            'Unit',
+            'Tenant',
+            'Insurance Provider',
+            'Policy ID',
+            'Liability Coverage',
+            'Expiration Date',
+            'Days to Expiration',
+            'Additional Notes'
+        ]
 
         # Delete first 2 rows
         self.dataframe.drop([0, 1], inplace=True, axis=0)
@@ -49,25 +62,48 @@ class RentersInsuranceReport(object):
         ], inplace=True, axis=1)
         self.dataframe.drop(self.dataframe.columns[7], axis=1, inplace=True)
 
+        # Change Unit and Tenant name orders
         self.dataframe['Name'], self.dataframe['Unit'] = self.dataframe['Unit'], self.dataframe['Name']
 
-        self.dataframe.columns = [
-            'Property Address',
-            'Unit',
-            'Tenant',
-            'Insurance Provider',
-            'Policy ID',
-            'Liability Coverage',
-            'Expiration Date',
-            'Additional Notes'
-        ]
+        # Add an empty column for Days to Expiration
+        self.dataframe.insert(7, "Dummy", None)
+
+        self.dataframe.columns = self.columns
         print("DATAFRAME")
         print(self.dataframe)
+
+    def get_report(self) -> None:
+
+        worksheet = self.workbook.add_worksheet("Renters Insurance MM-DD-YY")
+
+        expired_format = self.workbook.add_format({'border': 1, 'bg_color': 'red'})
+        about_to_expire_format = self.workbook.add_format({'border': 1, 'bg_color': 'yellow'})
+        under_insured_format = self.workbook.add_format({'border': 1, 'bg_color': 'blue'})
+        main_title_format = self.workbook.add_format({
+            "bold": 1,
+            "border": 1,
+            "align": "center",
+            "valign": "vcenter",
+        })
+
+        worksheet.write(1, 0, 'About to Expire', about_to_expire_format)
+        worksheet.write(2, 0, 'Master Policy', under_insured_format)
+        worksheet.write(3, 0, 'Under Insured (<$300,000)', under_insured_format)
+        worksheet.write(4, 0, 'Expired', expired_format)
+
+        worksheet.merge_range("E2:H2", "Renter's Insurance", main_title_format)
+        worksheet.merge_range("E5:G5", "Report Date:", main_title_format)
+
+        worksheet.hide_gridlines(2)
+        worksheet.autofit()
+
+        self.workbook.close()
 
 
 def main():
     report = RentersInsuranceReport(
         "/home/guilhe/Descargas/PolicySummary02_25_2025.xlsx")
+    report.get_report()
 
 
 if __name__ == "__main__":
