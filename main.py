@@ -82,16 +82,17 @@ class RentersInsuranceReport(object):
 
         worksheet = self.workbook.add_worksheet("Renters Insurance MM-DD-YY")
 
-        default_cell_format = self.workbook.add_format({'border': 1, 'bg_color': 'red', "align": "center", "valign": "vcenter"})
-        expired_format = self.workbook.add_format({'border': 1, 'bg_color': 'red', "align": "center", "valign": "vcenter"})
-        about_to_expire_format = self.workbook.add_format({'border': 1, 'bg_color': 'yellow', "align": "center", "valign": "vcenter"})
-        under_insured_format = self.workbook.add_format({'border': 1, 'bg_color': 'blue', "align": "center", "valign": "vcenter"})
+        default_cell_format = self.workbook.add_format({'border': 1, "align": "center", "valign": "vcenter", "text_wrap": True})
+        expired_format = self.workbook.add_format({'border': 1, 'bg_color': '#e99998', "align": "center", "valign": "vcenter"})
+        about_to_expire_format = self.workbook.add_format({'border': 1, 'bg_color': '#fff2cd', "align": "center", "valign": "vcenter"})
+        under_insured_format = self.workbook.add_format({'border': 1, 'bg_color': '#cfe2f3', "align": "center", "valign": "vcenter"})
+        master_policy_format = self.workbook.add_format({'border': 1, 'bg_color': '#dad2e9', "align": "center", "valign": "vcenter"})
         column_name_format = self.workbook.add_format({
             "bold": 1,
             "border": 1,
             "align": "center",
             "valign": "vcenter",
-            "bg_color": "gray"
+            "bg_color": "#d9d9d9"
         })
         main_title_format = self.workbook.add_format({
             "bold": 1,
@@ -101,7 +102,7 @@ class RentersInsuranceReport(object):
         })
 
         worksheet.write(1, 0, 'About to Expire', about_to_expire_format)
-        worksheet.write(2, 0, 'Master Policy', under_insured_format)
+        worksheet.write(2, 0, 'Master Policy', master_policy_format)
         worksheet.write(3, 0, 'Under Insured (<$300,000)', under_insured_format)
         worksheet.write(4, 0, 'Expired', expired_format)
 
@@ -112,11 +113,28 @@ class RentersInsuranceReport(object):
         worksheet.write_row(7, 0, self.columns, column_name_format)
 
         for index, row in self.dataframe.iterrows():
-            worksheet.write_row(8+index, 0, row)
+            worksheet.write_row(8+index, 0, row, default_cell_format)
 
         for index, _ in self.dataframe.iterrows():
-            idx = index + 8
-            worksheet.write_formula(idx, 7, f'=IF(G{idx+1}<>"", DAYS(G{idx+1}, H5), "N/A")') 
+            idx = index + 9
+            worksheet.write_formula(idx - 1, 7, f'=IF(G{idx}<>"", DAYS(G{idx}, $H$5), "N/A")', default_cell_format) 
+
+            worksheet.conditional_format(idx-1, 0, idx-1, 8, {
+                'type': 'formula',
+                'criteria': f'=$H{idx} < 0',
+                'format': expired_format
+            })
+            worksheet.conditional_format(idx-1, 0, idx-1, 8, {
+                'type': 'formula',
+                'criteria': f'=$H{idx} <= 30',
+                'format': about_to_expire_format
+            })
+            worksheet.conditional_format(idx-1, 0, idx-1, 8, {
+                'type': 'formula',
+                'criteria': f'=$F{idx} < 300000',
+                'format': under_insured_format
+            })
+
 
         worksheet.hide_gridlines(2)
         worksheet.autofit(max_width=180)
