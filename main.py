@@ -50,6 +50,9 @@ class RentersInsuranceReport(object):
         # Delete group rows like Unit and Property
         self.dataframe = self.dataframe.dropna(subset=['Unit'])
 
+        # Delete G... and Nestbit rows
+        self.dataframe.drop(self.dataframe[self.dataframe['Unit'].str.contains(r'G\d+', case=False, na=False)].index, axis=0, inplace=True)
+        self.dataframe.drop(self.dataframe[self.dataframe['Unit'].str.contains(r'(?i)nesbit', case=False, na=False)].index, axis=0, inplace=True)
         # Delete unnecesary columns
         self.dataframe.drop([
             'Occupancy Status',
@@ -125,7 +128,7 @@ class RentersInsuranceReport(object):
 
             worksheet.conditional_format(idx-1, 0, idx-1, 8, {
                 'type': 'formula',
-                'criteria': f'=$H{idx} < 0',
+                'criteria': f'=$H{idx} <= 0',
                 'format': expired_format
             })
             worksheet.conditional_format(idx-1, 0, idx-1, 8, {
