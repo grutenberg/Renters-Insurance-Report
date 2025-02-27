@@ -1,11 +1,13 @@
 import pandas as pd
 from xlsxwriter import Workbook
-
+from datetime import date
 
 class RentersInsuranceReport(object):
     def __init__(self, input_url: str) -> None:
         self.dataframe = pd.read_excel(input_url)
         self.workbook = Workbook("output.xlsx")
+        
+        self.report_date = date.today().__format__("%m/%d/%Y")
 
         self.columns = [
             'Property Address',
@@ -105,11 +107,16 @@ class RentersInsuranceReport(object):
 
         worksheet.merge_range("E2:H2", "Renter's Insurance", main_title_format)
         worksheet.merge_range("E5:G5", "Report Date:", main_title_format)
+        worksheet.write("H5", self.report_date, main_title_format)
 
         worksheet.write_row(7, 0, self.columns, column_name_format)
 
         for index, row in self.dataframe.iterrows():
             worksheet.write_row(8+index, 0, row)
+
+        for index, _ in self.dataframe.iterrows():
+            idx = index + 8
+            worksheet.write_formula(idx, 7, f'=IF(G{idx+1}<>"", DAYS(G{idx+1}, H5), "N/A")') 
 
         worksheet.hide_gridlines(2)
         worksheet.autofit(max_width=180)
