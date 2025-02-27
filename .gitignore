@@ -4,3 +4,6 @@ venv/
 
 # Ignorar archivos de Python cacheados
 __pycache__/
+
+# Ignorar output
+*.xlsx
