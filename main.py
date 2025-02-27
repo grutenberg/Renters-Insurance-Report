@@ -6,8 +6,8 @@ class RentersInsuranceReport(object):
     def __init__(self, input_url: str) -> None:
         self.dataframe = pd.read_excel(input_url)
         self.workbook = Workbook("output.xlsx")
-        
-        self.report_date = date.today().__format__("%m/%d/%Y")
+
+        self.report_date = date.today()
 
         self.columns = [
             'Property Address',
@@ -18,7 +18,10 @@ class RentersInsuranceReport(object):
             'Liability Coverage',
             'Expiration Date',
             'Days to Expiration',
-            'Additional Notes'
+            'Additional Notes',
+            "1st Attempt", 
+            "2nd Attempt", 
+            "3rd Attempt"
         ]
 
         # Delete first 2 rows
@@ -67,8 +70,9 @@ class RentersInsuranceReport(object):
         # Change Unit and Tenant name orders
         self.dataframe['Name'], self.dataframe['Unit'] = self.dataframe['Unit'], self.dataframe['Name']
 
-        # Add an empty column for Days to Expiration
+        # Add empty columns for Days to Expiration and Attempts
         self.dataframe.insert(7, "Dummy", None)
+        self.dataframe[["att1","att2","att3"]] = None
 
         self.dataframe.columns = self.columns
 
@@ -80,7 +84,7 @@ class RentersInsuranceReport(object):
 
     def get_report(self) -> None:
 
-        worksheet = self.workbook.add_worksheet("Renters Insurance MM-DD-YY")
+        worksheet = self.workbook.add_worksheet(f"Renters Insurance {self.report_date.__format__('%m-%d-%Y')}")
 
         default_cell_format = self.workbook.add_format({'border': 1, "align": "center", "valign": "vcenter", "text_wrap": True})
         expired_format = self.workbook.add_format({'border': 1, 'bg_color': '#e99998', "align": "center", "valign": "vcenter"})
@@ -108,7 +112,7 @@ class RentersInsuranceReport(object):
 
         worksheet.merge_range("E2:H2", "Renter's Insurance", main_title_format)
         worksheet.merge_range("E5:G5", "Report Date:", main_title_format)
-        worksheet.write("H5", self.report_date, main_title_format)
+        worksheet.write("H5", self.report_date.__format__("%m/%d/%Y"), main_title_format)
 
         worksheet.write_row(7, 0, self.columns, column_name_format)
 
