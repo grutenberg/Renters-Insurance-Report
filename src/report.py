@@ -148,12 +148,3 @@ class RentersInsuranceReport(object):
 
         self.workbook.close()
 
-
-def main():
-    report = RentersInsuranceReport(
-        "/home/guilhe/Descargas/PolicySummary02_25_2025.xlsx")
-    report.get_report()
-
-
-if __name__ == "__main__":
-    main()
