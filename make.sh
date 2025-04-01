@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pyinstaller --clean --onefile --name reporter ./src/main.py
+pyinstaller --clean --onefile --name reporter ./src/interface.py
