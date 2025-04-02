@@ -2,12 +2,14 @@ import pandas as pd
 from xlsxwriter import Workbook
 from datetime import date
 
+
 class RentersInsuranceReport(object):
     def __init__(self, input_url: str) -> None:
         self.dataframe = pd.read_excel(input_url)
-        self.workbook = Workbook("output.xlsx")
 
         self.report_date = date.today()
+
+        self.workbook = Workbook(f"RentersInsuranceReport{self.report_date.__format__('%m%d%Y')}.xlsx")
 
         self.columns = [
             'Property Address',
