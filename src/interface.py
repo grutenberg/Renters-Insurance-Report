@@ -18,11 +18,14 @@ class ReporterWindow(tk.CTk):
         self.file_button = tk.CTkButton(self, text="Select file", command=self.process_report)
         self.file_button.pack()
 
-        self.info_screen = tk.CTkLabel(self, text="Some label", wraplength=300)
+        self.info_screen = tk.CTkLabel(self, text="", wraplength=300)
         self.info_screen.pack(pady=20)
 
     def process_report(self):
         filename = tk.filedialog.askopenfilename(title="Select PolicySummary report")
+
+        if not filename:
+            return
 
         self.alert(f"Selected file: {filename}")
 
